@@ -1,3 +1,6 @@
+#### 10.0.0 - 2025-11-08
+* Support for .NET 10.0
+
 #### 9.0.2 - 2024-11-19
 * paket restore on projects with targetframework net9.0-windows - https://github.com/fsprojects/Paket/pull/4279
 

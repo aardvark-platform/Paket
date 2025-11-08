@@ -5,11 +5,11 @@
     <DebugType>embedded</DebugType>
     <!-- package metadata -->
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <Description>A dependency manager for .NET with support for NuGet packages and git repositories.</Description>
+    <Description>A dependency manager for .NET with support for NuGet packages and git repositories. Aardvark Platform fork with .NET 10.0 support.</Description>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <PackageProjectUrl>http://fsprojects.github.io/Paket</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/aardvark-platform/Paket</PackageProjectUrl>
     <PackageIcon>logo.png</PackageIcon>
     <PackageTags>nuget;bundler;F#</PackageTags>
-    <Authors>Paket team</Authors>
+    <Authors>Paket team, Aardvark Platform Team</Authors>
   </PropertyGroup>
 </Project>

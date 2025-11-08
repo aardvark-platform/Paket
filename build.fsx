@@ -23,7 +23,7 @@ open System.Xml.Linq
 
 // The name of the project
 // (used by attributes in AssemblyInfo, name of a NuGet package and directory in 'src')
-let project = "Paket"
+let project = "Aardvark.Paket"
 
 // Short summary of the project
 // (used as description in AssemblyInfo and as a short summary for NuGet package)
@@ -34,7 +34,7 @@ let summary = "A dependency manager for .NET with support for NuGet packages and
 let description = "A dependency manager for .NET with support for NuGet packages and git repositories."
 
 // List of author names (for NuGet package)
-let authors = [ "Paket team" ]
+let authors = [ "Paket team"; "Aardvark Platform Team" ]
 
 // Tags for your project (for NuGet package)
 let tags = "nuget, bundler, F#"
@@ -43,12 +43,12 @@ let tags = "nuget, bundler, F#"
 let solutionFile = "Paket.sln"
 
 // Pattern specifying assemblies to be tested using NUnit
-let testAssemblies = "tests/**/bin/Release/net461/*Tests*.dll"
-let integrationTestAssemblies = "integrationtests/Paket.IntegrationTests/bin/Release/net461/*Tests*.dll"
+let testAssemblies = "tests/**/bin/Release/net462/*Tests*.dll"
+let integrationTestAssemblies = "integrationtests/Paket.IntegrationTests/bin/Release/net462/*Tests*.dll"
 
 // Git configuration (used for publishing documentation in gh-pages branch)
 // The profile where the project is posted
-let gitOwner = "fsprojects"
+let gitOwner = "aardvark-platform"
 let gitHome = "https://github.com/" + gitOwner
 
 // The name of the project on GitHub
@@ -66,10 +66,10 @@ let mutable dotnetExePath = "dotnet"
 // --------------------------------------------------------------------------------------
 
 let buildDir = "bin"
-let buildDirNet461 = buildDir @@ "net461"
+let buildDirNet462 = buildDir @@ "net462"
 let buildDirNetCore = buildDir @@ "netcoreapp3.1"
 let buildDirBootstrapper = "bin_bootstrapper"
-let buildDirBootstrapperNet461 = buildDirBootstrapper @@ "net461"
+let buildDirBootstrapperNet462 = buildDirBootstrapper @@ "net462"
 let buildDirBootstrapperNetCore = buildDirBootstrapper @@ "netcoreapp2.1"
 let tempDir = "temp"
 let buildMergedDir = buildDir @@ "merged"
@@ -115,10 +115,10 @@ Target "Clean" (fun _ ->
     !! "src/**/bin"
     ++ "tests/**/bin"
     ++ buildDir
-    ++ buildDirNet461
+    ++ buildDirNet462
     ++ buildDirNetCore
     ++ buildDirBootstrapper
-    ++ buildDirBootstrapperNet461
+    ++ buildDirBootstrapperNet462
     ++ buildDirBootstrapperNetCore
     ++ tempDir
     |> CleanDirs
@@ -190,8 +190,8 @@ Target "Publish" (fun _ ->
     DotNetCli.Publish (fun c ->
         { c with
             Project = "src/Paket"
-            Framework = "net461"
-            Output = FullName (currentDirectory </> buildDirNet461)
+            Framework = "net462"
+            Output = FullName (currentDirectory </> buildDirNet462)
             ToolPath = dotnetExePath
             AdditionalArgs = publishArgs
         })
@@ -208,8 +208,8 @@ Target "Publish" (fun _ ->
     DotNetCli.Publish (fun c ->
         { c with
             Project = "src/Paket.Bootstrapper"
-            Framework = "net461"
-            Output = FullName (currentDirectory </> buildDirBootstrapperNet461)
+            Framework = "net462"
+            Output = FullName (currentDirectory </> buildDirBootstrapperNet462)
             ToolPath = dotnetExePath
             AdditionalArgs = publishArgs
         })
@@ -247,10 +247,10 @@ Target "RunTests" (fun _ ->
                 ToolPath = dotnetExePath
             })
 
-    runTest "net" "Paket.Tests" "net461"
+    runTest "net" "Paket.Tests" "net462"
     runTest "netcore" "Paket.Tests" "netcoreapp3.0"
 
-    runTest "net" "Paket.Bootstrapper.Tests" "net461"
+    runTest "net" "Paket.Bootstrapper.Tests" "net462"
     runTest "netcore" "Paket.Bootstrapper.Tests" "netcoreapp3.0"
 )
 
@@ -283,11 +283,11 @@ Target "QuickIntegrationTests" (fun _ ->
 
 Target "MergePaketTool" (fun _ ->
     CreateDir buildMergedDir
-    let inBuildDirNet461 (file: string) = buildDirNet461 @@ file
+    let inBuildDirNet462 (file: string) = buildDirNet462 @@ file
 
     // syntax for ilrepack requires the 'primary' assembly to be the first positional argument, so we enforce that by not making
     // paket.exe part of the ordered 'component' libraries
-    let primaryExe = inBuildDirNet461 "paket.exe"
+    let primaryExe = inBuildDirNet462 "paket.exe"
 
     let mergeLibs =
         [
@@ -313,13 +313,13 @@ Target "MergePaketTool" (fun _ ->
             "System.Security.Cryptography.Pkcs.dll"
             "System.Threading.Tasks.Extensions.dll"
         ]
-        |> List.map inBuildDirNet461
+        |> List.map inBuildDirNet462
         |> separated " "
 
     let result =
         ExecProcess (fun info ->
             info.FileName <- currentDirectory </> "packages" </> "build" </> "ILRepack" </> "tools" </> "ILRepack.exe"
-            info.Arguments <- sprintf "/copyattrs /lib:%s /ver:%s /out:%s %s %s" buildDirNet461 release.AssemblyVersion paketFile primaryExe mergeLibs
+            info.Arguments <- sprintf "/copyattrs /lib:%s /ver:%s /out:%s %s %s" buildDirNet462 release.AssemblyVersion paketFile primaryExe mergeLibs
             ) (TimeSpan.FromMinutes 5.)
 
     if result <> 0 then failwithf "Error during ILRepack execution."
@@ -335,7 +335,7 @@ Target "RunIntegrationTestsNet" (fun _ ->
     DotNetCli.Test (fun c ->
         { c with
             Project = "integrationtests/Paket.IntegrationTests/Paket.IntegrationTests.fsproj"
-            Framework = "net461"
+            Framework = "net462"
             AdditionalArgs =
               [ "--filter"; (if testSuiteFilterFlakyTests then "TestCategory=Flaky" else "TestCategory!=Flaky")
                 sprintf "--logger:trx;LogFileName=%s" ("tests_result/net/Paket.IntegrationTests/TestResult.trx" |> Path.GetFullPath) ]
@@ -657,7 +657,7 @@ Target "ReleaseGitHub" (fun _ ->
     |> uploadFile "./bin/merged/paket.exe"
     |> uploadFile "./bin/merged/paket-sha256.txt"
     |> uploadFile "./src/FSharp.DependencyManager.Paket/bin/Release/netstandard2.0/FSharp.DependencyManager.Paket.dll"
-    |> uploadFile "./bin_bootstrapper/net461/paket.bootstrapper.exe"
+    |> uploadFile "./bin_bootstrapper/net462/paket.bootstrapper.exe"
     |> uploadFile ".paket/paket.targets"
     |> uploadFile ".paket/Paket.Restore.targets"
     |> uploadFile (tempDir </> sprintf "Paket.%s.nupkg" (release.NugetVersion))
