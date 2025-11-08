@@ -124,7 +124,7 @@ type NuGetPackageCache =
       Version: string
       CacheVersion: string }
 
-    static member CurrentCacheVersion = "7.0"
+    static member CurrentCacheVersion = "8.0"
 
     member this.WithDependencies (dependencies : (PackageName * VersionRequirement * FrameworkRestrictions) list) =
         { this with
